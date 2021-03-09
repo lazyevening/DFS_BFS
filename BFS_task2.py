@@ -1,6 +1,6 @@
 from collections import deque
 
-filename = "BFS_test.txt"
+filename = "in.txt"
 
 
 def bfs():
@@ -30,7 +30,7 @@ def bfs():
                     while next_v != -1:
                         cycle.add(next_v)
                         next_v = parents[next_v]
-                    return 'N', cycle
+                    return 'N', sorted(list(cycle))
     return 'A'
 
 
@@ -44,4 +44,15 @@ with open(filename) as file:
     size, graph = int(lines[0]), [list(map(int, add_rubbish_at_0(x.split()))) for x in lines[1:]]
     graph.insert(0, [])
 
-print(bfs())
+a = bfs()
+print(a)
+res = ''
+res += a[0]
+if len(a) == 2:
+    res += " "
+    for i in a[1]:
+        res += str(i) + " "
+
+res = res[:-1]
+with open('out.txt', mode='w') as file:
+    file.write(res)
