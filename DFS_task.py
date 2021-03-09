@@ -1,6 +1,4 @@
-import sys
-
-filename = sys.argv[1]
+filename = 'in.txt'
 with open(filename) as file:
     lines = file.readlines()
     size, graph = int(lines[0]), [list(map(int, x.split()[:-1])) for x in lines[1:]]
@@ -28,5 +26,10 @@ def find_components():
 
 
 find_components()
+res = ''
 for component in components[:-1]:
-    print(' '.join(component) + ' 0')
+    res += ' '.join(component) + ' 0'
+    res += '\n'
+
+with open('out.txt', mode='w') as file:
+    file.write(res)
