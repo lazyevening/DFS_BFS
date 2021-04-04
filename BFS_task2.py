@@ -1,10 +1,11 @@
 from collections import deque
 
-filename = "in.txt"
+filename = "BFS_test.txt"
 
 
 def bfs():
     queue = deque()
+    parents_first = set()
     visited = set()
     parents = [0 for _ in range(size + 1)]
     parents[1] = -1
@@ -24,11 +25,16 @@ def bfs():
                     cycle = set()
                     next_v = w
                     while next_v != -1:
+                        parents_first.add(next_v)
                         cycle.add(next_v)
                         next_v = parents[next_v]
                     next_v = v
-                    while next_v != -1:
+                    while next_v not in parents_first:
                         cycle.add(next_v)
+                        next_v = parents[next_v]
+                    next_v = parents[next_v]
+                    while next_v != -1:
+                        cycle.remove(next_v)
                         next_v = parents[next_v]
                     return 'N', sorted(list(cycle))
     return 'A'
