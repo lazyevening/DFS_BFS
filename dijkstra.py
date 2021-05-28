@@ -1,3 +1,7 @@
+import heapq as hq
+
+import math
+
 in_filename = 'in.txt'
 out_filename = 'out.txt'
 
@@ -8,7 +12,7 @@ def write_file(_path, max_weight):
             file.write("Y\n")
             result = ''
             for i in _path:
-                result += str(i+1)+ " "
+                result += str(i + 1) + " "
             file.write(result.rstrip() + '\n')
             file.write(str(max_weight))
         else:
@@ -24,39 +28,34 @@ def read_file(filename):
 
 
 def transform_to_matrix(N, weights):
-    matrix = [[-1 for _ in range(N)] for _ in range(N)]
-
-    # for i in zip(range(1, len(weights) + 1), weights):
-
+    matrix = [[] for _ in range(N)]
+    print(weights)
     for i in range(len(weights)):
         if len(weights[i]) > 0:
             for j in range(0, len(weights[i]), 2):
-                matrix[weights[i][j] - 1][i] = weights[i][j + 1]
+                matrix[weights[i][j] - 1].append((i, weights[i][j + 1]))
     return matrix
 
 
-def apply_dijkstra(N, S, matrix):
-    print(N, S, matrix)
-    valid = [True] * N
-    weight = [float('inf')] * N
-    weight[S] = 0
-    parent = [S] * (N)
-    parent[S] = -1
-    for i in range(N):
-        min_weight = float('inf')
-        ID_min_weight = -1
-        # бирается мин метка вершины из не посещенных
-        for i in range(N):
-            if valid[i] and weight[i] < min_weight:
-                min_weight = weight[i]
-                ID_min_weight = i
-        for i in range(N):
-            if matrix[ID_min_weight][i] != -1:
-                if weight[i] > max(weight[ID_min_weight], matrix[ID_min_weight][i]):
-                    weight[i] = max(weight[ID_min_weight], matrix[ID_min_weight][i])
-                    parent[i] = ID_min_weight
-            valid[ID_min_weight] = False
-    return weight, [x for x in parent]
+def apply_dijkstra(G, s):
+    n = len(G)
+    visited = [False] * n
+    weights = [math.inf] * n
+    path = [-1] * n
+    queue = []
+    weights[s] = 1
+    hq.heappush(queue, (1, s))
+    while len(queue) > 0:
+        g, u = hq.heappop(queue)
+        visited[u] = True
+        for v, w in G[u]:
+            if not visited[v]:
+                f = g * w
+                if f < weights[v]:
+                    weights[v] = f
+                    path[v] = u
+                    hq.heappush(queue, (f, v))
+    return path, weights
 
 
 def find_path(point_from, point_to, parents):
@@ -77,13 +76,17 @@ def find_path(point_from, point_to, parents):
 def main():
     N, weights, from_v, to_v = read_file(in_filename)
     matrix = transform_to_matrix(N, weights)
-    w, parents = apply_dijkstra(N, from_v - 1, matrix)
-    path = find_path(from_v - 1, to_v - 1, parents)
-    weight = sum([w[x] for x in path])
-    if str(weight) == 'inf':
+    print(matrix)
+    parents, w = apply_dijkstra(matrix, from_v - 1)
+    print(w, parents)
+    if str(w[to_v - 1]) == 'inf':
         write_file([], '')
     else:
-        write_file(path, weight)
+        path = find_path(from_v - 1, to_v - 1, parents)
+        print(path)
+        write_file(path, w[to_v - 1])
+
+
 
 
 if __name__ == '__main__':
